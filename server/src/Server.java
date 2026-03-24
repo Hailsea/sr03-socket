@@ -15,8 +15,8 @@ public class Server {
             while (true){
                 Socket newClientSocket = serverSocket.accept();
                 System.out.println("New client connected");
-                Client newClient=new Client(newClientSocket);
-                Client.clientList.add(newClient);
+                ClientConnexion newClient=new ClientConnexion(newClientSocket);
+                ClientConnexion.clientList.add(newClient);
                 newClient.start();
             }
         } catch (IOException e) {
