@@ -8,7 +8,8 @@ public class Client {
     public static void main(String[] args) {
         try (Socket socket = new Socket(HOST, PORT)){
             System.out.println("Connected to server on " + HOST + ":" + PORT);
-            // TODO Thread
+            Listener l = new Listener(socket);
+            Sender s = new Sender(socket);
         } catch (IOException e){
             System.err.println("Could not connect to server: " + e.getMessage());
         }
