@@ -32,20 +32,26 @@ public class Client extends Thread {
             while (true){
                 if (alias==null){   // get the alias
                     out.write("Choose an alias : ".getBytes());
-                    in.read();
+                    while (bytesRead==-1){
+                        bytesRead=in.read(b);
+                    }
                     chaine=new String(b,0,bytesRead);
+                    System.out.println("chaine : "+chaine);
                     //check duplicates
-                    if (!aliasesList.contains(chaine)) {
+                    /*
+                    if (chaine.isEmpty() && !aliasesList.contains(chaine)) {
                         alias = chaine;
                         aliasesList.add(chaine);
                         Broadcast((chaine + " has joined the chat."));
                     }
-                    else{
+                    else{*/
                         out.write("This alias is already taken.".getBytes());
-                    }
+                   // }
                 }
                 else{               // waiting for messages or exit
-                    in.read();
+                    while (bytesRead==-1){
+                        bytesRead=in.read(b);
+                    }
                     chaine=new String(b,0,bytesRead);
                     if (chaine.equals("exit")) {
                         clientList.remove(socket);
@@ -62,15 +68,15 @@ public class Client extends Thread {
     }
 
     public static void Broadcast(String message) throws IOException {
-        for (Client c : clientList) {
-            if (c.alias!=null) c.out.write((message).getBytes());
-        }
+//        for (Client c : clientList) {
+//            if (c.alias!=null) c.out.write((message).getBytes());
+//        }
     }
 
     public static void Broadcast(String message,String name) throws IOException {
-        for (Client c : clientList) { //check later
-            if (c.alias!=null) c.out.write((name +" : "+message).getBytes());
-        }
+//        for (Client c : clientList) { //check later
+//            if (c.alias!=null) c.out.write((name +" : "+message).getBytes());
+//        }
     }
 
     public Socket getSocket() {
