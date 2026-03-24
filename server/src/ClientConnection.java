@@ -4,7 +4,7 @@ import java.util.HashSet;
 
 
 public class ClientConnection extends Thread {
-    public static HashSet<ClientConnection> clientList = new HashSet<ClientConnexion>();
+    public static HashSet<ClientConnection> clientList = new HashSet<ClientConnection>();
     public static HashSet<String> aliasesList = new HashSet<String>();
     private Socket socket;
     private BufferedReader in;
@@ -58,13 +58,13 @@ public class ClientConnection extends Thread {
     }
 
     private static void Broadcast(String alias, String s) {
-        for (ClientConnexion c : clientList) {
+        for (ClientConnection c : clientList) {
             if (c.alias!=null) c.out.println(alias +" : "+s);
         }
     }
 
     private static void Broadcast(String message) {
-        for (ClientConnexion c : clientList)
+        for (ClientConnection c : clientList)
             if (c.alias != null) c.out.println(message);
     }
 }
