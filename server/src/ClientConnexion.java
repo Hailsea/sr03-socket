@@ -3,15 +3,15 @@ import java.net.Socket;
 import java.util.HashSet;
 
 
-public class ClientConnexion extends Thread {
-    public static HashSet<ClientConnexion> clientList = new HashSet<ClientConnexion>();
+public class ClientConnection extends Thread {
+    public static HashSet<ClientConnection> clientList = new HashSet<ClientConnexion>();
     public static HashSet<String> aliasesList = new HashSet<String>();
     private Socket socket;
     private BufferedReader in;
     private PrintWriter out;
     private String alias;
 
-    public ClientConnexion(Socket s) throws IOException {
+    public ClientConnection(Socket s) throws IOException {
         this.out = new PrintWriter(new OutputStreamWriter(s.getOutputStream()), true);
         this.in = new BufferedReader(new InputStreamReader(s.getInputStream()));
         this.alias = null;
@@ -29,8 +29,12 @@ public class ClientConnexion extends Thread {
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
+                if (s == null || s.isEmpty()){
+                    out.println("This alias isn't valid");
+                    continue;
+                }
                 //check duplicates
-                if (s.isEmpty() && !aliasesList.contains(s)) {
+                if (!aliasesList.contains(s)) {
                     alias = s;
                     aliasesList.add(s);
                     Broadcast((s + " has joined the chat."));
