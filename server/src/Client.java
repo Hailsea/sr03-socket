@@ -2,11 +2,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.util.HashMap;
+import java.util.HashSet;
 
 
 public class Client extends Thread {
-    public static HashMap<Client,String> clientList=new HashMap<Client,String>();
+    public static HashSet<Client> clientList=new HashSet<Client>();
+    public static HashSet<String> aliasesList=new HashSet<String>();
     private Socket socket;
     private InputStream in;
     private OutputStream out;
@@ -34,10 +35,14 @@ public class Client extends Thread {
                     in.read();
                     chaine=new String(b,0,bytesRead);
                     //check duplicates
-
-                    alias=chaine;
-                    Broadcast((chaine+" has joined the chat."));
-
+                    if (!aliasesList.contains(chaine)) {
+                        alias = chaine;
+                        aliasesList.add(chaine);
+                        Broadcast((chaine + " has joined the chat."));
+                    }
+                    else{
+                        out.write("This alias is already taken.".getBytes());
+                    }
                 }
                 else{               // waiting for messages or exit
                     in.read();
@@ -57,13 +62,13 @@ public class Client extends Thread {
     }
 
     public static void Broadcast(String message) throws IOException {
-        for (Client c : clientList.keySet()) {
+        for (Client c : clientList) {
             if (c.alias!=null) c.out.write((message).getBytes());
         }
     }
 
     public static void Broadcast(String message,String name) throws IOException {
-        for (Client c : clientList.keySet()) { //check later
+        for (Client c : clientList) { //check later
             if (c.alias!=null) c.out.write((name +" : "+message).getBytes());
         }
     }

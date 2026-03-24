@@ -16,8 +16,8 @@ public class Server {
                 Socket newClientSocket = serverSocket.accept();
                 System.out.println("New client connected");
                 Client newClient=new Client(newClientSocket);
-                Client.clientList.put(newClient,"");
-                newClient.run();
+                Client.clientList.add(newClient);
+                newClient.start();
             }
         } catch (IOException e) {
             System.err.println("Error while starting the server: " + e.getMessage());
