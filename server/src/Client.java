@@ -4,7 +4,6 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.util.HashMap;
 
-
 public class Client extends Thread {
     public static HashMap<Client,String> clientList=new HashMap<Client,String>();
     private Socket socket;
@@ -15,8 +14,8 @@ public class Client extends Thread {
     public Client(Socket s){
         this.socket=s;
         try {
-            in=this.socket.getInputStream();
-            out=this.socket.getOutputStream();
+            this.in=this.socket.getInputStream();
+            this.out=this.socket.getOutputStream();
         } catch (IOException e) {
             System.out.println("Error while getting data streams from socket.");
         }
@@ -29,27 +28,8 @@ public class Client extends Thread {
         int bytesRead=0;
         try {
             while (true){
-                if (alias==null){   // get the alias
-                    out.write("Choose an alias : ".getBytes());
-                    in.read();
-                    chaine=new String(b,0,bytesRead);
-                    //check duplicates
-
-                    alias=chaine;
-                    Broadcast((chaine+" has joined the chat."));
-
-                }
-                else{               // waiting for messages or exit
-                    in.read();
-                    chaine=new String(b,0,bytesRead);
-                    if (chaine.equals("exit")) {
-                        clientList.remove(socket);
-                        socket.close();
-                    }
-                    else{
-                        Broadcast(alias, chaine);
-                    }
-                }
+                in.read();
+                chaine=new String(b,0,bytesRead);
             }
         } catch (Exception e) {
             System.err.println("Error during communication with client : " + e.getMessage());
@@ -57,14 +37,8 @@ public class Client extends Thread {
     }
 
     public static void Broadcast(String message) throws IOException {
-        for (Client c : clientList.keySet()) {
-            if (c.alias!=null) c.out.write((message).getBytes());
-        }
-    }
-
-    public static void Broadcast(String message,String name) throws IOException {
         for (Client c : clientList.keySet()) { //check later
-            if (c.alias!=null) c.out.write((name +" : "+message).getBytes());
+            c.out.write(message.getBytes());
         }
     }
 
@@ -99,4 +73,3 @@ public class Client extends Thread {
         this.alias = alias;
     }
 }
-
