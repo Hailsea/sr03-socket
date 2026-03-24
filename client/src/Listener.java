@@ -1,6 +1,5 @@
 import java.io.*;
 import java.net.Socket;
-import java.net.SocketException;
 
 public class Listener extends Thread{
     private final BufferedReader reader;
