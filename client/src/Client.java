@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.Socket;
 
 public class Client {
@@ -12,6 +13,10 @@ public class Client {
             Sender s = new Sender(socket);
             l.start();
             s.start();
+            InputStream in =socket.getInputStream();
+            byte[] b=new byte[150];
+            in.read(b);
+            System.out.println("outstream"+new String(b));
         } catch (IOException e){
             System.err.println("Could not connect to server: " + e.getMessage());
         }
