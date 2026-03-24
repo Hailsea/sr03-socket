@@ -10,7 +10,6 @@ public class Sender extends Thread{
     public Sender(Socket socket) throws IOException {
         this.out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()), true);
         this.keyboard = new BufferedReader(new InputStreamReader(System.in));
-        this.start();
     }
 
     @Override
@@ -18,7 +17,8 @@ public class Sender extends Thread{
         while(!line.equals("exit")){
             try {
                 line = keyboard.readLine();
-                out.println(line);
+                if (!line.isEmpty())
+                    out.println(line);
             } catch (IOException e) {
                 System.out.println("Soucis Sender");
                 break;
