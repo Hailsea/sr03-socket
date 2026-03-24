@@ -10,6 +10,8 @@ public class Client {
             System.out.println("Connected to server on " + HOST + ":" + PORT);
             Listener l = new Listener(socket);
             Sender s = new Sender(socket);
+            l.start();
+            s.start();
         } catch (IOException e){
             System.err.println("Could not connect to server: " + e.getMessage());
         }

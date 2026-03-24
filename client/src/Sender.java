@@ -13,12 +13,14 @@ public class Sender extends Thread{
 
     @Override
     public void run(){
+
         while(true){
             try {
                 String message = keyboard.readLine();
+                System.out.println(message);
                 out.println(message);
             } catch (IOException e) {
-                System.out.println("Soucis");
+                System.out.println("Soucis Sender");
                 break;
             }
         }
