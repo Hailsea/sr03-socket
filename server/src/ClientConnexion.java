@@ -11,9 +11,10 @@ public class ClientConnexion extends Thread {
     private PrintWriter out;
     private String alias;
 
-    public ClientConnexion(Socket s) throws IOException {
-        this.out = new PrintWriter(new OutputStreamWriter(s.getOutputStream()), true);
-        this.in = new BufferedReader(new InputStreamReader(s.getInputStream()));
+    public ClientConnexion(Socket socket) throws IOException {
+        this.socket = socket;
+        this.out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()), true);
+        this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         this.alias = null;
     }
 
@@ -62,6 +63,38 @@ public class ClientConnexion extends Thread {
     private static void Broadcast(String message) {
         for (ClientConnexion c : clientList)
             if (c.alias != null) c.out.println(message);
+    }
+
+    public Socket getSocket() {
+        return socket;
+    }
+
+    public void setSocket(Socket socket) {
+        this.socket = socket;
+    }
+
+    public BufferedReader getIn() {
+        return in;
+    }
+
+    public void setIn(BufferedReader in) {
+        this.in = in;
+    }
+
+    public PrintWriter getOut() {
+        return out;
+    }
+
+    public void setOut(PrintWriter out) {
+        this.out = out;
+    }
+
+    public String getAlias() {
+        return alias;
+    }
+
+    public void setAlias(String alias) {
+        this.alias = alias;
     }
 }
 
