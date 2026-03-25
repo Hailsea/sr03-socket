@@ -15,6 +15,8 @@ public class Listener extends Thread{
         try {
             while(true) {
                 line = reader.readLine();
+                if (line == null)
+                    return;
                 System.out.println(line);
             }
         } catch (IOException e){

@@ -25,7 +25,7 @@ public class ClientConnection extends Thread {
                     out.println("Choose an alias : ");
                     try {
                         s = in.readLine();
-                        System.out.println("chaine : " + s);
+                        System.out.println("client : " + s);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
@@ -38,6 +38,7 @@ public class ClientConnection extends Thread {
                         alias = s;
                         aliasesList.add(s);
                         Broadcast((s + " has joined the chat."));
+                        out.println("-------------------------");
                     } else {
                         out.println("This alias is already taken.");
                     }
@@ -45,10 +46,15 @@ public class ClientConnection extends Thread {
                     try {// waiting for messages or exit
                         s = in.readLine();
                         if (s.equals("exit")) {
-                            clientList.remove(socket);
+                            clientList.remove(this);
+                            aliasesList.remove(this.alias);
                             socket.close();
+                            Broadcast(alias + " quite the chat.");
+                            System.out.println("A client is gone");
+                            return;
                         } else {
                             Broadcast(alias, s);
+                            System.out.println(alias + ": " + s);
                         }
                     } catch (IOException e) {
                         System.out.println("Soucis Serveur: " + e);
