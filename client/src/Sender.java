@@ -1,8 +1,10 @@
 import java.io.*;
 import java.net.Socket;
-import java.util.Scanner;
 
-public class Sender extends Thread{
+/**
+ * Class handling client-side output. This thread reads user input from the standard input and sends it to the server.
+ */
+public class Sender extends Thread {
     private final PrintWriter out;
     private final BufferedReader keyboard;
     private String line = "";
@@ -13,14 +15,15 @@ public class Sender extends Thread{
     }
 
     @Override
-    public void run(){
-        while(!line.equals("exit")){
+    public void run() {
+        while (!line.equals("exit")) {
             try {
                 line = keyboard.readLine();
-                if (!line.isEmpty())
-                    out.println(line);
+
+                if (!line.isEmpty()) out.println(line);
+
             } catch (IOException e) {
-                System.out.println("Error Sender"+e);
+                System.out.println("Error Sender" + e);
                 break;
             }
         }
