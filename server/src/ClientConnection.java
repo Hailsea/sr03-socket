@@ -1,14 +1,15 @@
 import java.io.*;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.HashSet;
 
 
 public class ClientConnection extends Thread {
-    public static HashSet<ClientConnection> clientList = new HashSet<ClientConnection>();
-    public static HashSet<String> aliasesList = new HashSet<String>();
-    private Socket socket;
-    private BufferedReader in;
-    private PrintWriter out;
+    public static HashSet<ClientConnection> clientList = new HashSet<>();
+    public static HashSet<String> aliasesList = new HashSet<>(); //TODO welcomeback
+    private final Socket socket;
+    private final BufferedReader in;
+    private final PrintWriter out;
     private String alias;
 
     public ClientConnection(Socket socket) throws IOException {
@@ -21,43 +22,55 @@ public class ClientConnection extends Thread {
     public void run() {
             String s;
             while (true) {
+
                 if (alias == null) {   // get the alias
                     out.println("Choose an alias : ");
+
                     try {
                         s = in.readLine();
-                        System.out.println("client : " + s);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
+                    } catch (IOException e) { //TODO faire une classe ClientConnectionException hihi
+                        System.err.println("Client connection crashed.");
+                        return;
                     }
+
                     if (s == null || s.isEmpty()) {
-                        out.println("This alias isn't valid");
+                        out.println("This alias isn't valid.");
                         continue;
                     }
+
                     //check duplicates
                     if (!aliasesList.contains(s)) {
                         alias = s;
                         aliasesList.add(s);
+
                         Broadcast((s + " has joined the chat."));
                         out.println("-------------------------");
+
+                        System.out.println("Client connected: "+alias);
                     } else {
                         out.println("This alias is already taken.");
                     }
+
                 } else {
-                    try {// waiting for messages or exit
+                    // waiting for messages or exit
+                    try {
                         s = in.readLine();
                         if (s.equals("exit")) {
-                            clientList.remove(this);
-                            aliasesList.remove(this.alias);
                             socket.close();
-                            Broadcast(alias + " quite the chat.");
-                            System.out.println("A client is gone");
+                            DeleteTheClient();
+                            System.out.println("Client disconnected: "+alias);
                             return;
                         } else {
                             Broadcast(alias, s);
-                            System.out.println(alias + ": " + s);
+                            System.out.println(alias+": "+s);
                         }
+                    } catch (SocketException e){
+                        DeleteTheClient();
+                        System.err.println(alias+" disappeared: "+e.getMessage());
+                        return;
                     } catch (IOException e) {
-                        System.out.println("Soucis Serveur: " + e);
+                        System.err.println("Error Server: "+e.getMessage());
+                        return;
                     }
                 }
             }
@@ -72,37 +85,10 @@ public class ClientConnection extends Thread {
         for (ClientConnection c : clientList)
             if (c.alias != null) c.out.println(message);
     }
-
-    public Socket getSocket() {
-        return socket;
-    }
-
-    public void setSocket(Socket socket) {
-        this.socket = socket;
-    }
-
-    public BufferedReader getIn() {
-        return in;
-    }
-
-    public void setIn(BufferedReader in) {
-        this.in = in;
-    }
-
-    public PrintWriter getOut() {
-        return out;
-    }
-
-    public void setOut(PrintWriter out) {
-        this.out = out;
-    }
-
-    public String getAlias() {
-        return alias;
-    }
-
-    public void setAlias(String alias) {
-        this.alias = alias;
+    private void DeleteTheClient(){
+        clientList.remove(this);
+        aliasesList.remove(alias);
+        Broadcast(alias+" quit the chat.");
     }
 }
 

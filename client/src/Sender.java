@@ -20,7 +20,7 @@ public class Sender extends Thread{
                 if (!line.isEmpty())
                     out.println(line);
             } catch (IOException e) {
-                System.out.println("Soucis Sender");
+                System.out.println("Error Sender"+e);
                 break;
             }
         }
