@@ -11,13 +11,13 @@ public class Listener extends Thread{
     @Override
     public void run(){
         try {
-            while(true) {
+            while(!Thread.currentThread().isInterrupted()) {
                 String line = reader.readLine();
-                if (line == null)
-                    return;
+                if (line==null) break;
                 System.out.println(line);
             }
-        } catch (IOException e){
+        }
+        catch (IOException e){
             System.out.println("Error Listener: " + e);
         }
     }

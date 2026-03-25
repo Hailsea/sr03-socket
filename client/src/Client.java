@@ -1,6 +1,5 @@
 import java.io.IOException;
 import java.net.Socket;
-import java.util.HashSet;
 
 public class Client {
     private static final String HOST = "localhost";
@@ -14,8 +13,15 @@ public class Client {
             Sender s=new Sender(socket);
             l.start();
             s.start();
-        } catch (IOException e){
-            System.err.println("Could not connect to server: "+e.getMessage());
+            while (l.isAlive() || s.isAlive()){
+                if (!s.isAlive()) l.interrupt();
+                if (!l.isAlive() && s.isAlive()) {
+                    s.interrupt();
+                    System.out.println("Lost connection to server.");
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Could not connect to server: " + e.getMessage());
         }
     }
 }
