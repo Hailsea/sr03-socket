@@ -10,7 +10,7 @@ public class Server {
         System.out.println("Starting server on port: " + PORT);
         try (ServerSocket serverSocket = new ServerSocket(PORT)){
             while (true){
-                Socket newClientSocket = serverSocket.accept();
+                Socket newClientSocket=serverSocket.accept();
                 System.out.println("New client connected");
                 ClientConnection newClient=new ClientConnection(newClientSocket);
                 ClientConnection.clientList.add(newClient);
