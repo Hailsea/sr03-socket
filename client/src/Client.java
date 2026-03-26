@@ -17,7 +17,7 @@ public class Client {
                 if (!s.isAlive()) l.interrupt();
                 if (!l.isAlive() && s.isAlive()) {
                     s.interrupt();
-                    System.out.println("Lost connection to server.");
+                    System.err.println("Lost connection to server.");
                 }
             }
         } catch (IOException e) {

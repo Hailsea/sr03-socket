@@ -18,7 +18,7 @@ public class Listener extends Thread{
             }
         }
         catch (IOException e){
-            System.out.println("Error Listener: " + e);
+            System.err.println("Error Listener: " + e);
         }
     }
 }

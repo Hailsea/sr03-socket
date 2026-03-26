@@ -23,7 +23,7 @@ public class Sender extends Thread{
                 }
 
             } catch (IOException e) {
-                System.out.println("Error Sender: " + e.getMessage());
+                System.err.println("Error Sender: " + e.getMessage());
                 break;
             }
         }
