@@ -12,23 +12,25 @@ public class Client {
         try {
             Socket socket=new Socket(HOST, PORT);
             System.out.println("Connected to server on "+HOST+": "+PORT);
+
             Listener l=new Listener(socket);
             Sender s=new Sender(socket);
+
             l.start();
             s.start();
+
             while (l.isAlive() || s.isAlive()){
                 if (!s.isAlive() && !l.isInterrupted()) {
                     l.interrupt();
-                    System.err.println("Client exited");
                 }
                 if (!l.isAlive() && s.isAlive() && !s.isInterrupted()) {
                     s.interrupt();
                     System.err.println("Lost connection to server.");
                 }
             }
+
         } catch (IOException e) {
             System.err.println("Could not connect to server: " + e.getMessage());
-
         }
     }
 }

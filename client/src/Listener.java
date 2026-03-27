@@ -14,17 +14,15 @@ public class Listener extends Thread {
     @Override
     public void run(){
         try {
-            while() {
+            while(!Thread.currentThread().isInterrupted()) {
                 String line = reader.readLine();
                 if (line!=null)  {
                     System.out.println(line);
                 }
             }
-            return;
         }
         catch (IOException e){
             System.err.println("Error Listener: " + e);
         }
-        System.err.println("L ENDED");
     }
 }
