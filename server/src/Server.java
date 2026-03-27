@@ -19,7 +19,6 @@ public class Server {
                 ClientConnection newClient = new ClientConnection(newClientSocket);
                 ClientConnection.clientList.add(newClient);
                 newClient.start();
-                // TODO gestion kill de l'instance de serveur (les clients doient être kill aussi)
             }
         } catch (IOException e) {
             System.err.println("Error while starting the server: " + e.getMessage());

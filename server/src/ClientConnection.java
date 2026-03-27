@@ -1,15 +1,15 @@
 import java.io.*;
 import java.net.Socket;
 import java.util.HashSet;
+import java.util.concurrent.ConcurrentHashMap;
 
-//TODO thread-safe List
 /**
  * Represents a connection with a client. Each client runs on a dedicated thread with its own input and output streams.
  * It manages the client's alias and handles chat communication.
  */
 public class ClientConnection extends Thread {
     public static HashSet<ClientConnection> clientList = new HashSet<>();
-    public static HashSet<String> aliasesList = new HashSet<>(); //TODO welcomeback
+    public static ConcurrentHashMap<ClientConnection, String> aliasesList = new ConcurrentHashMap<>(); //TODO welcomeback
     private final Socket socket;
     private final BufferedReader in;
     private final PrintWriter out;
@@ -24,13 +24,12 @@ public class ClientConnection extends Thread {
     @Override
     public void run() {
         try {
-            this.alias = registerAlias();
-
-            broadcast(alias + " has joined the chat.");
-            out.println("-------------------------");
-            System.out.println("Client connected: "+alias);
+            this.alias = askAlias();
 
             if (this.alias != null) {
+                broadcast(alias + " has joined the chat.");
+                out.println("-------------------------");
+                System.out.println("Client connected: "+alias);
                 chat();
             }
         } catch (ClientConnectionException e) {
@@ -40,7 +39,13 @@ public class ClientConnection extends Thread {
         }
     }
 
-    private String registerAlias() throws ClientConnectionException {
+    /**
+     * Ask a pseudo to the client and verify if it's valid
+     *
+     * @return String
+     * @throws ClientConnectionException
+     */
+    private String askAlias() throws ClientConnectionException {
         String alias;
         while(true) {
             out.println("Choose an alias : ");
@@ -55,7 +60,7 @@ public class ClientConnection extends Thread {
                     return null;
                 } else {
                     if (!aliasesList.contains(alias)) {
-                        aliasesList.add(alias);
+                        aliasesList.put(this, alias);
                         return alias;
                     } else {
                         out.println("This alias is already taken.");
@@ -67,6 +72,10 @@ public class ClientConnection extends Thread {
         }
     }
 
+    /**
+     * Chat method that handle socket error from the client and the server
+     * @throws ClientConnectionException
+     */
     private void chat() throws ClientConnectionException{
         String message;
         while(true){ // waiting for messages or exit
@@ -82,14 +91,15 @@ public class ClientConnection extends Thread {
                     broadcast(alias, message);
                     System.out.println(alias+": "+message);
                 }
-            } catch (NullPointerException e){ //broken socket
-                throw new ClientConnectionException(this.alias);
             } catch (IOException e) { // quand un client crash c'est ca qui catch
                 throw new ClientConnectionException(this.alias);
             }
         }
     }
 
+    /**
+     * Close the client socket and remove it from the client list and it alias form the alias list
+     */
     private void disconnectClient() {
         try {
             socket.close();
@@ -98,7 +108,7 @@ public class ClientConnection extends Thread {
         }
 
         clientList.remove(this);
-        aliasesList.remove(alias);
+        aliasesList.remove(this, alias);
         broadcast(alias + " quit the chat.");
     }
 

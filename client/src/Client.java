@@ -14,14 +14,25 @@ public class Client {
             System.out.println("Connected to server on "+HOST+": "+PORT);
             Listener l=new Listener(socket);
             Sender s=new Sender(socket);
-            l.start();
             s.start();
+            l.start();
             while (l.isAlive() || s.isAlive()){
-                if (!s.isAlive()) l.interrupt();
-                if (!l.isAlive() && s.isAlive()) {
+
+                if (!s.isAlive()) {
+                    socket.close();
+                    l.interrupt();
+                    System.out.println(l.getState());
+                    System.out.println(s.getState());
+                    System.out.println(l.isAlive());
+                    System.out.println(s.isAlive());
+                    System.out.println("Client exit");
+                }
+                if (!l.isAlive()) {
+                    socket.close();
                     s.interrupt();
+                    System.out.println(l.isAlive());
+                    System.out.println(s.isAlive());
                     System.err.println("Lost connection to server.");
-                    break; // Je l'ai ajoute car ca boucle mais peut etre regler le soucis de boucle
                 }
             }
         } catch (IOException e) {

@@ -16,18 +16,18 @@ public class Sender extends Thread {
 
     @Override
     public void run() {
-        while (!line.equals("exit") && !Thread.currentThread().isInterrupted()) {
-            try {
-                if (keyboard.ready()){
+        try {
+            while (!line.equals("exit") && !Thread.currentThread().isInterrupted()) {
+                if (keyboard.ready()) {
                     line = keyboard.readLine();
-                    if (!line.isEmpty())
+                    if (!line.isEmpty()) {
                         out.println(line);
+                    }
                 }
-
-            } catch (IOException e) {
-                System.err.println("Error Sender: " + e.getMessage());
-                break;
             }
+            return;
+        } catch (IOException e) {
+            System.err.println("Error Sender: " + e.getMessage());
         }
     }
 }
