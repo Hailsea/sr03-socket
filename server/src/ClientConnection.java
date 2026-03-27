@@ -1,9 +1,7 @@
 import java.io.*;
 import java.net.Socket;
-import java.net.SocketException;
 import java.util.HashSet;
 
-//TODO separate login from chat
 //TODO thread-safe List
 /**
  * Represents a connection with a client. Each client runs on a dedicated thread with its own input and output streams.
@@ -21,6 +19,87 @@ public class ClientConnection extends Thread {
         this.socket = socket;
         this.out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()), true);
         this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+    }
+
+    @Override
+    public void run() {
+        try {
+            this.alias = registerAlias();
+
+            broadcast(alias + " has joined the chat.");
+            out.println("-------------------------");
+            System.out.println("Client connected: "+alias);
+
+            if (this.alias != null) {
+                chat();
+            }
+        } catch (ClientConnectionException e) {
+            System.out.println(e.getMessage());
+        } finally {
+            disconnectClient();
+        }
+    }
+
+    private String registerAlias() throws ClientConnectionException {
+        String alias;
+        while(true) {
+            out.println("Choose an alias : ");
+            try {
+                alias = in.readLine();
+                if (alias == null) {
+                    throw new ClientConnectionException();
+                } else if (alias.isEmpty()) {
+                    out.println("This alias isn't valid.");
+                } else if (alias.equals("exit")) {
+                    System.out.println("Unnamed client disconnected.");
+                    return null;
+                } else {
+                    if (!aliasesList.contains(alias)) {
+                        aliasesList.add(alias);
+                        return alias;
+                    } else {
+                        out.println("This alias is already taken.");
+                    }
+                }
+            } catch (IOException e){
+                throw new ClientConnectionException();
+            }
+        }
+    }
+
+    private void chat() throws ClientConnectionException{
+        String message;
+        while(true){ // waiting for messages or exit
+            try {
+                message = in.readLine();
+                if (message == null) {
+                    throw new ClientConnectionException(this.alias);
+                }
+                if (message.equals("exit")) {
+                    System.out.println("Client disconnected: "+this.alias);
+                    return;
+                } else {
+                    broadcast(alias, message);
+                    System.out.println(alias+": "+message);
+                }
+            } catch (NullPointerException e){ //broken socket
+                throw new ClientConnectionException(this.alias);
+            } catch (IOException e) { // quand un client crash c'est ca qui catch
+                throw new ClientConnectionException(this.alias);
+            }
+        }
+    }
+
+    private void disconnectClient() {
+        try {
+            socket.close();
+        } catch (IOException e) {
+            System.err.println("Error closing socket.");
+        }
+
+        clientList.remove(this);
+        aliasesList.remove(alias);
+        broadcast(alias + " quit the chat.");
     }
 
     /**
@@ -41,81 +120,4 @@ public class ClientConnection extends Thread {
         for (ClientConnection c : clientList)
             if (c.alias != null) c.out.println(message);
     }
-
-    @Override
-    public void run() {
-            String s;
-            while (true) {
-
-                if (alias == null) {   // get the alias
-                    out.println("Choose an alias : ");
-                    try {
-                        s = in.readLine();
-                        if (s==null){
-                            System.err.println("Unnamed client connection crashed.");
-                            return;
-                        }
-                        else if (s.isEmpty()) {
-                            out.println("This alias isn't valid.");
-                            continue;
-                        }
-                        else if (s.equals("exit")) {
-                            socket.close();
-                            deleteTheClient();
-                            System.out.println("Unnamed client disconnected.");
-                            return;
-                        }
-                    } catch (IOException e) { //TODO faire une classe ClientConnectionException hihi
-                        System.err.println("Unnamed client connection crashed.");
-                        return;
-                    }
-
-                    //check duplicates
-                    if (!aliasesList.contains(s)) {
-                        alias = s;
-                        aliasesList.add(s);
-
-                        broadcast((s + " has joined the chat."));
-                        out.println("-------------------------");
-
-                        System.out.println("Client connected: "+alias);
-                    } else {
-                        out.println("This alias is already taken.");
-                    }
-
-                } else {
-                    // waiting for messages or exit
-                    try {
-                        s = in.readLine();
-                        if (s.equals("exit")) {
-                            socket.close();
-                            deleteTheClient();
-                            System.out.println("Client disconnected: "+alias);
-                            return;
-                        } else {
-                            broadcast(alias, s);
-                            System.out.println(alias+": "+s);
-                        }
-                    } catch (NullPointerException e){ //broken socket
-                        deleteTheClient();
-                        System.err.println(alias+" disappeared. Client left unexpectedly.");
-                        return;
-                    } catch (IOException e) {
-                        System.err.println("Error Server: "+e.getMessage());
-                        return;
-                    }
-                }
-            }
-        }
-
-    /**
-     * Delete the client of clientList and aliasesList and Broadcast a message
-     */
-    private void deleteTheClient() {
-        clientList.remove(this);
-        aliasesList.remove(alias);
-        broadcast(alias + " quit the chat.");
-    }
 }
-
-
