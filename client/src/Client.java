@@ -5,26 +5,27 @@ import java.net.Socket;
  * Client-side class that connects to the server, listens for server responses, and sends messages to the server.
  */
 public class Client {
+
     private static final String HOST = "localhost";
     private static final Integer PORT = 10000;
 
     public static void main(String[] args) {
         try {
-            Socket socket=new Socket(HOST, PORT);
+            Socket socket = new Socket(HOST, PORT);
             System.out.println("Connected to server on "+HOST+": "+PORT);
 
-            Listener l=new Listener(socket);
-            Sender s=new Sender(socket);
+            Listener listener = new Listener(socket);
+            Sender sender = new Sender(socket);
 
-            l.start();
-            s.start();
+            listener.start();
+            sender.start();
 
-            while (l.isAlive() || s.isAlive()){
-                if (!s.isAlive() && !l.isInterrupted()) {
-                    l.interrupt();
+            while (listener.isAlive() || sender.isAlive()){
+                if (!sender.isAlive() && !listener.isInterrupted()) { //stop listener when sender is stopped
+                    listener.interrupt();
                 }
-                if (!l.isAlive() && s.isAlive() && !s.isInterrupted()) {
-                    s.interrupt();
+                if (!listener.isAlive() && !sender.isInterrupted()) { //stop sender when listener is stopped
+                    sender.interrupt();
                     System.err.println("Lost connection to server.");
                 }
             }
