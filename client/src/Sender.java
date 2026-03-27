@@ -20,14 +20,13 @@ public class Sender extends Thread {
             while (!line.equals("exit") && !Thread.currentThread().isInterrupted()) {
                 if (keyboard.ready()) {
                     line = keyboard.readLine();
-                    if (!line.isEmpty()) {
+                    if (!line.isEmpty())
                         out.println(line);
-                    }
                 }
             }
-            return;
         } catch (IOException e) {
             System.err.println("Error Sender: " + e.getMessage());
         }
+        System.err.println("S ENDED");
     }
 }

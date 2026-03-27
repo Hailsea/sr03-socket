@@ -14,24 +14,15 @@ public class Client {
             System.out.println("Connected to server on "+HOST+": "+PORT);
             Listener l=new Listener(socket);
             Sender s=new Sender(socket);
-            s.start();
             l.start();
+            s.start();
             while (l.isAlive() || s.isAlive()){
-
-                if (!s.isAlive()) {
-                    socket.close();
+                if (!s.isAlive() && !l.isInterrupted()) {
                     l.interrupt();
-                    System.out.println(l.getState());
-                    System.out.println(s.getState());
-                    System.out.println(l.isAlive());
-                    System.out.println(s.isAlive());
-                    System.out.println("Client exit");
+                    System.err.println("Client exited");
                 }
-                if (!l.isAlive()) {
-                    socket.close();
+                if (!l.isAlive() && s.isAlive() && !s.isInterrupted()) {
                     s.interrupt();
-                    System.out.println(l.isAlive());
-                    System.out.println(s.isAlive());
                     System.err.println("Lost connection to server.");
                 }
             }
