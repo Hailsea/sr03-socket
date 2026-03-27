@@ -14,14 +14,19 @@ public class Client {
             l.start();
             s.start();
             while (l.isAlive() || s.isAlive()){
-                if (!s.isAlive()) l.interrupt();
-                if (!l.isAlive() && s.isAlive()) {
+                if (!s.isAlive() && !l.isInterrupted()){
+                    l.interrupt();
+                    System.err.println("Client exit.");
+                }
+                if (!l.isAlive() && s.isAlive() && !s.isInterrupted()) {
                     s.interrupt();
                     System.err.println("Lost connection to server.");
                 }
             }
         } catch (IOException e) {
             System.err.println("Could not connect to server: " + e.getMessage());
+        } finally {
         }
+
     }
 }
