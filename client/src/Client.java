@@ -17,11 +17,13 @@ public class Client {
             l.start();
             s.start();
             while (l.isAlive() || s.isAlive()){
-                if (!s.isAlive()) l.interrupt();
-                if (!l.isAlive() && s.isAlive()) {
+                if (!s.isAlive() && !l.isInterrupted()) {
+                    l.interrupt();
+                    System.err.println("Client exited");
+                }
+                if (!l.isAlive() && s.isAlive() && !s.isInterrupted()) {
                     s.interrupt();
                     System.err.println("Lost connection to server.");
-                    break; // Je l'ai ajoute car ca boucle mais peut etre regler le soucis de boucle
                 }
             }
         } catch (IOException e) {
