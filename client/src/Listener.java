@@ -1,6 +1,4 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.Socket;
 
 /**
@@ -14,16 +12,15 @@ public class Listener extends Thread {
     }
 
     @Override
-    public void run() {
+    public void run(){
         try {
-            while (true) {
+            while(!Thread.currentThread().isInterrupted()) {
                 String line = reader.readLine();
-
-                if (line == null) return;
-
+                if (line==null) break;
                 System.out.println(line);
             }
-        } catch (IOException e) {
+        }
+        catch (IOException e){
             System.err.println("Error Listener: " + e);
         }
     }
