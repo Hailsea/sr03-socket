@@ -116,8 +116,11 @@ public class ClientConnection extends Thread {
         }
 
         clientList.remove(this);
-        aliasesList.remove(alias);
-        broadcast(alias + " quit the chat.");
+        try{
+            aliasesList.remove(alias);
+            broadcast(alias + " quit the chat.");
+        }
+        catch(NullPointerException e){} // alias non défini
     }
 
     /**
