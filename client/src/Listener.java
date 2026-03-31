@@ -17,7 +17,9 @@ public class Listener extends Thread {
         try {
             while(!Thread.currentThread().isInterrupted()) {
                 String line = reader.readLine();
-                if (line!=null)  {
+                if (line==null)  {
+                    break;
+                }else{
                     System.out.println(line);
                 }
             }
