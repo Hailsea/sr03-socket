@@ -17,16 +17,15 @@ public class Listener extends Thread {
         try {
             while(!Thread.currentThread().isInterrupted()) {
                 String line = reader.readLine();
-                if (line!=null)  {
-                    System.out.println(line);
-                }else{
+                if (line==null)  {
                     break;
+                }else{
+                    System.out.println(line);
                 }
             }
         }
         catch (IOException e){
             System.err.println("Error Listener: " + e);
         }
-        System.err.println("L ENDED");
     }
 }
