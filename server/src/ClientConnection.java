@@ -116,8 +116,10 @@ public class ClientConnection extends Thread {
         }
 
         clientList.remove(this);
-        aliasesList.remove(alias);
-        broadcast(alias + " quit the chat.");
+        if (this.alias != null) {
+            aliasesList.remove(this.alias);
+            broadcast(this.alias + " quit the chat.");
+        }
     }
 
     /**
